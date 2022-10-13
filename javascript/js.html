@@ -1,0 +1,133 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+            
+      document.getElementById("salvarEquip").addEventListener("click", cadEquip);
+      document.getElementById("limpaEquip").addEventListener("click", limpaEquip);
+      document.getElementById("btnPesquisaEquip").addEventListener("click", solucaoEquip);
+      //document.getElementById("pesquisa-tab").addEventListener("click", listSolucoes)
+      function limpaEquip(){
+        document.getElementById("formEquipamento").reset();
+      }
+      function cadEquip(){
+        var equipInfo = {};
+        //equipInfo.modelEquip = Math.random().toString(36).substr(2, 9);
+        equipInfo.modelEquip = document.getElementById("modeloEquip").value;
+        equipInfo.statusEquip = document.getElementById("statusEquip").checked == true ? "1" : "0";
+        equipInfo.servicoEquip = document.getElementById("servicoEquip").checked == true ? "1" : "0";
+        equipInfo.bioEquip = document.getElementById("bioEquip").checked == true ? "1" : "0";
+        equipInfo.barrasEquip = document.getElementById("barrasEquip").checked == true ? "1" : "0";
+        equipInfo.abaEquip = document.getElementById("abaEquip").checked == true ? "1" : "0";
+        equipInfo.mifareEquip = document.getElementById("mifareEquip").checked == true ? "1" : "0";
+        equipInfo.sintomaEquip = document.getElementById("sintomaEquip").value;
+        equipInfo.solucaoEquip = document.getElementById("solucaoEquip").value;
+        
+        
+        
+        
+        google.script.run.saveEquip(equipInfo);
+        //document.getElementById("formEquipamento").reset();
+        
+        $(".alert-success").fadeIn();
+        $(".alert-success").fadeOut(6000);
+      }
+      function solucaoEquip(){
+        //$("#tbodySolucoes tr").remove();
+        $( "#listSolucoesEquip" ).load(window.location.href + " #listSolucoesEquip" );
+        
+        var pesquisa = document.getElementById("pesquisaSol").value;
+        google.script.run.withSuccessHandler(listSolucoes).getSolucoesPesquisa(pesquisa);
+      }
+
+      function listSolucoes(search){ 
+        var k=0;
+        var cell;
+        
+        table = document.getElementById("listSolucoesEquip");
+        
+        let thead = document.createElement('thead');
+        let row_1 = document.createElement('tr');
+        let heading_1 = document.createElement('th');
+        heading_1.innerHTML = "#";
+        let heading_2 = document.createElement('th');
+        heading_2.innerHTML = "Equipamento";
+        let heading_3 = document.createElement('th');
+        heading_3.innerHTML = "Sintoma";
+        let heading_4 = document.createElement('th');
+        heading_4.innerHTML = "Solução";
+        
+        table.appendChild(thead);
+        row_1.appendChild(heading_1);
+        row_1.appendChild(heading_2);
+        row_1.appendChild(heading_3);
+        row_1.appendChild(heading_4);
+        thead.appendChild(row_1);
+
+        var arrayS = JSON.parse(search);//transforma o stringify em array com a ajuda do window e seta no Array
+        
+        for(var i = 0; i < arrayS.length; i++)
+           {
+              
+              // create a new row
+              var newRow = table.insertRow(table.length);
+              for(var j = 0; j < arrayS[i].length; j++)
+              {
+                //window.alert(j);
+                  //window.alert(k);
+                  // create a new cell
+                  cell = newRow.insertCell(k);
+                  
+                  // add value to the cell
+                  cell.innerHTML = arrayS[i][j];
+                  k+=1;
+                  
+                }
+              }
+              // create a new cell
+              cell = newRow.insertCell(4);
+                    
+              // add value to the cell
+              cell.innerHTML = '<button type="button" class="btn btn-primary" data-id="'+arrayS[i][0]+'" onclick="callSolucao('+arrayS[i][0]+')">Editar</button>';
+              // create a new cell
+              cell = newRow.insertCell(5);
+                    
+              // add value to the cell
+              cell.innerHTML = '<button type="button" class="btn btn-primary" data-id="'+arrayS[i][0]+'" onclick="excluiSolucao('+arrayS[i][0]+')">Excluir</button>';
+              
+                k=0;
+            }
+      }
+
+      function callSolucao(id){
+        
+        google.script.run.withSuccessHandler(editSolucao).getEquipamentosById(id);
+        
+      } 
+      function editSolucao(solucao){
+        var r = JSON.parse(solucao);
+        
+        document.getElementById("modeloEquip").value = r[0][1];
+        r[0][2] == 1 ? document.getElementById("statusEquip").checked = true : document.getElementById("statusEquip").checked = false;
+        r[0][3] == 1 ? document.getElementById("servicoEquip").checked = true : document.getElementById("servicoEquip").checked = false;
+        r[0][4] == 1 ? document.getElementById("bioEquip").checked = true : document.getElementById("bioEquip").checked = false;
+        r[0][5] == 1 ? document.getElementById("barrasEquip").checked = true : document.getElementById("barrasEquip").checked = false;
+        r[0][6] == 1 ? document.getElementById("abaEquip").checked = true : document.getElementById("abaEquip").checked = false; 
+        r[0][7] == 1 ? document.getElementById("mifareEquip").checked = true : document.getElementById("mifareEquip").checked = false; 
+        
+        document.getElementById("sintomaEquip").value = r[0][8];
+        document.getElementById("solucaoEquip").value = r[0][9];
+        
+        
+      }
+      function excluiSolucao(id){
+        if (confirm('Quer mesmo excluir essa solução?')) {
+          // Save it!
+          google.script.run.withSuccessHandler().deleteSolucaoById(id);
+          setTimeout(function(){solucaoEquip();}, 500); 
+        }
+         
+          
+      } 
+
+
+    </script>
