@@ -1,4 +1,4 @@
-const id = '1Apl5W629-q03E10LrfFteFTNksF4l-VZ9yXt0cmOH1o';//Planilha a ser utilizada como banco de dados
+const id = '';//Planilha a ser utilizada como banco de dados
 const ss = SpreadsheetApp.openById(id);
 const Route = {};
 Route.path = function(route,callback){
